@@ -1,9 +1,9 @@
 'use strict';
 
 // CHANGE THESE THREE VARIABLES! //
-var deviceHost = "192.168.16.198" // This is the IP address shown in Arduino IDE Serial Monitor after uploading Firmata
-var deviceID = 'Andorbal'; // This is the deviceID you entered in iothub-explorer
-var deviceKey = 'bJwcjN+94PpHCBXRP+Rn1cbofhGvrM6Ck3grCignwZw='; // This is the primary key returned by iothub-explorer
+var deviceHost = "192.168.xx.xxx" // This is the IP address shown in Arduino IDE Serial Monitor after uploading Firmata
+var deviceID = 'xxxxx'; // This is the deviceID you entered in iothub-explorer
+var deviceKey = 'xxxxxxxxxxxxxxxxxx'; // This is the primary key returned by iothub-explorer
 
 // Node modules - Don't modify
 var moment = require('moment');
@@ -137,7 +137,7 @@ function letsPlay(){
         console.log("Stop!");
     }
     function left() {
-        leftWheel.rev(0);
+        leftWheel.rev(0.1);
         rightWheel.fwd(0);
         currentaction = "lt";
         console.log("Left!");
