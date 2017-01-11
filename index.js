@@ -14,25 +14,6 @@ var Protocol = require('azure-iot-device-amqp').Amqp;
 var Client = require('azure-iot-device').Client;
 var Message = require('azure-iot-device').Message;
 
-
-var CustomMotor = function(config) {
-  this.pins = [
-    new five.Pin({ pin: config.pins[0] }),
-    new five.Pin({ pin: config.pins[1] })
-  ];
-}
-
-CustomMotor.prototype.fwd = function(val) {
-  this.pins[1].write(1);
-  this.pins[0].write(val);
-}
-
-CustomMotor.prototype.rev = function(val) {
-  this.pins[1].write(0);
-  this.pins[0].write(val);
-}
-
-
 // Setup - Don't modify
 var board = new five.Board({
     io: new Firmata(new EtherPortClient({ host: deviceHost, port: 3030 })), timeout: 30000 });
@@ -149,8 +130,8 @@ function letsPlay(){
         console.log("Right!");
     }
     function turbo() {
-      speed = speed === 255 ? 128 : 255;
-      console.log("Turbo!");
+      speed = speed === 255 ? 100 : 255;
+      console.log("Turbo: " + (speed === 255 ? 'ON!!!' : 'off'));
     }
     function exit() {
         currentaction = "offline";
