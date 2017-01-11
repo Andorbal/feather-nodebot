@@ -1,9 +1,9 @@
 'use strict';
 
 // CHANGE THESE THREE VARIABLES! //
-var deviceHost = "192.168.XX.XX" // This is the IP address shown in Arduino IDE Serial Monitor after uploading Firmata
-var deviceID = 'myname'; // This is the deviceID you entered in iothub-explorer
-var deviceKey = 'XXXXXXXXXXXXXXXXXXXXXX'; // This is the primary key returned by iothub-explorer
+var deviceHost = "192.168.16.198" // This is the IP address shown in Arduino IDE Serial Monitor after uploading Firmata
+var deviceID = 'Andorbal'; // This is the deviceID you entered in iothub-explorer
+var deviceKey = 'bJwcjN+94PpHCBXRP+Rn1cbofhGvrM6Ck3grCignwZw='; // This is the primary key returned by iothub-explorer
 
 // Node modules - Don't modify
 var moment = require('moment');
@@ -14,6 +14,25 @@ var Protocol = require('azure-iot-device-amqp').Amqp;
 var Client = require('azure-iot-device').Client;
 var Message = require('azure-iot-device').Message;
 
+
+var CustomMotor = function(config) {
+  this.pins = [
+    new five.Pin({ pin: config.pins[0] }),
+    new five.Pin({ pin: config.pins[1] })
+  ];
+}
+
+CustomMotor.prototype.fwd = function(val) {
+  this.pins[0].write(val);
+  this.pins[1].write(1);
+}
+
+CustomMotor.prototype.rev = function(val) {
+  this.pins[0].write(val);
+  this.pins[1].write(0);
+}
+
+
 // Setup - Don't modify
 var board = new five.Board({
     io: new Firmata(new EtherPortClient({ host: deviceHost, port: 3030 })), timeout: 30000 });
@@ -23,7 +42,7 @@ var currentaction = "offline";
 board.on('ready', function () {
     letsPlay();
     var connectCallback = function (err) {
-        if (err) { console.error('Your device is not connected to the web dashboard. Could not connect: ' + err.message); } 
+        if (err) { console.error('Your device is not connected to the web dashboard. Could not connect: ' + err.message); }
         else {
             console.log('Client connected');
             client.on('message', function (msg) {
@@ -51,14 +70,16 @@ board.on('ready', function () {
         };
     }
 function letsPlay(){
-    var rightWheel = new five.Motor({ pins: [4, 12], invertPWM: false });
-    var leftWheel = new five.Motor({ pins: [5, 14], invertPWM: false });
+    var rightWheel = new CustomMotor({ pins: [4, 12]});
+    var leftWheel = new CustomMotor({ pins: [5, 14]});
+    //var rightWheel = new five.Motor({ pins: [4, 12], invertPWM: false });
+    //var leftWheel = new five.Motor({ pins: [5, 14], invertPWM: false });
     var scalar = 256; // Friction coefficient
     var actioncounter = 0;
     var newcommand = "home()";
     var speed = 255;
     leftWheel.rev(0);
-    rightWheel.rev(0); 
+    rightWheel.rev(0);
 
     function actionSender(){
         var distance = 0;
@@ -77,8 +98,8 @@ function letsPlay(){
             newcommand = "home()";
             distance = 0;
         }
-        else { 
-            newcommand = "fd(0)"; 
+        else {
+            newcommand = "fd(0)";
             distance = 0;
         };
         distance = distance.toString();
@@ -92,7 +113,7 @@ function letsPlay(){
 ////////////////////////////////////////////////////////////////
 
 // Write your Johnny-Five code here!
-    
+
 
 ///////////////////////////////////////////////////////////////
 
@@ -103,9 +124,15 @@ function letsPlay(){
         currentaction = "fd";
         console.log("Forward!");
     }
+    function reverse() {
+        leftWheel.rev(255);
+        rightWheel.rev(255);
+        currentaction = "rv";
+        console.log("Reverse!");
+    }
     function stop() {
         leftWheel.rev(0); // This makes the car stop.
-        rightWheel.rev(0); 
+        rightWheel.rev(0);
         currentaction = "stopped";
         console.log("Stop!");
     }
@@ -129,6 +156,7 @@ function letsPlay(){
 // This is the code for controlling car actions from the command line
     var keyMap = {
         'up': forward,
+        'down': reverse,
         'left': left,
         'right': right,
         'space': stop,
