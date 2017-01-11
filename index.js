@@ -118,14 +118,14 @@ function letsPlay(){
         console.log("Stop!");
     }
     function left() {
-        leftWheel.rev(speed);
+        leftWheel.rev(0);
         rightWheel.fwd(speed);
         currentaction = "lt";
         console.log("Left!");
     }
     function right() {
         leftWheel.fwd(speed);
-        rightWheel.rev(speed);
+        rightWheel.rev(0);
         currentaction = "rt";
         console.log("Right!");
     }
