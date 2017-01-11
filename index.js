@@ -1,9 +1,9 @@
 'use strict';
 
 // CHANGE THESE THREE VARIABLES! //
-var deviceHost = "192.168.xx.xxx" // This is the IP address shown in Arduino IDE Serial Monitor after uploading Firmata
-var deviceID = 'xxxxx'; // This is the deviceID you entered in iothub-explorer
-var deviceKey = 'xxxxxxxxxxxxxxxxxx'; // This is the primary key returned by iothub-explorer
+var deviceHost = "192.168.16.198" // This is the IP address shown in Arduino IDE Serial Monitor after uploading Firmata
+var deviceID = 'Andorbal'; // This is the deviceID you entered in iothub-explorer
+var deviceKey = 'bJwcjN+94PpHCBXRP+Rn1cbofhGvrM6Ck3grCignwZw='; // This is the primary key returned by iothub-explorer
 
 // Node modules - Don't modify
 var moment = require('moment');
@@ -23,13 +23,13 @@ var CustomMotor = function(config) {
 }
 
 CustomMotor.prototype.fwd = function(val) {
-  this.pins[0].write(val);
   this.pins[1].write(1);
+  this.pins[0].write(val);
 }
 
 CustomMotor.prototype.rev = function(val) {
-  this.pins[0].write(val);
   this.pins[1].write(0);
+  this.pins[0].write(val);
 }
 
 
@@ -70,10 +70,10 @@ board.on('ready', function () {
         };
     }
 function letsPlay(){
-    var rightWheel = new CustomMotor({ pins: [4, 12]});
-    var leftWheel = new CustomMotor({ pins: [5, 14]});
-    //var rightWheel = new five.Motor({ pins: [4, 12], invertPWM: false });
-    //var leftWheel = new five.Motor({ pins: [5, 14], invertPWM: false });
+    //var rightWheel = new CustomMotor({ pins: [4, 12]});
+    //var leftWheel = new CustomMotor({ pins: [5, 14]});
+    var rightWheel = new five.Motor({ pins: [4, 12], invertPWM: true });
+    var leftWheel = new five.Motor({ pins: [5, 14], invertPWM: true });
     var scalar = 256; // Friction coefficient
     var actioncounter = 0;
     var newcommand = "home()";
@@ -119,14 +119,14 @@ function letsPlay(){
 
 // These functions are for stopping and moving the car with a little workaround specific to the Feather HUZZAH board and Johnny-Five. Leave these as they are.
     function forward() {
-        leftWheel.fwd(0);
-        rightWheel.fwd(0);
+        leftWheel.fwd(speed);
+        rightWheel.fwd(speed);
         currentaction = "fd";
         console.log("Forward!");
     }
     function reverse() {
-        leftWheel.rev(255);
-        rightWheel.rev(255);
+        leftWheel.rev(speed);
+        rightWheel.rev(speed);
         currentaction = "rv";
         console.log("Reverse!");
     }
@@ -137,16 +137,20 @@ function letsPlay(){
         console.log("Stop!");
     }
     function left() {
-        leftWheel.rev(0.1);
-        rightWheel.fwd(0);
+        leftWheel.rev(speed);
+        rightWheel.fwd(speed);
         currentaction = "lt";
         console.log("Left!");
     }
     function right() {
-        leftWheel.fwd(0);
-        rightWheel.rev(0);
+        leftWheel.fwd(speed);
+        rightWheel.rev(speed);
         currentaction = "rt";
         console.log("Right!");
+    }
+    function turbo() {
+      speed = speed === 255 ? 128 : 255;
+      console.log("Turbo!");
     }
     function exit() {
         currentaction = "offline";
@@ -160,6 +164,7 @@ function letsPlay(){
         'left': left,
         'right': right,
         'space': stop,
+        'z': turbo,
         'q': exit
     };
 
